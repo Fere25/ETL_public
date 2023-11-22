@@ -5,7 +5,7 @@ insert into deaise.voal_stg_clients_del ( client_id )
 select client_id from deaise.voal_stg_clients;
 
 -- 2. Загрузка в приемник "вставок" на источнике (формат SCD2)
-insert into deaise.voal_stg_clients_hist ( client_id, last_name, first_name, patronymic, date_of_birth, passport_num, passport_valid_to, phone, effective_from, effective_to, deleted_flg )
+insert into deaise.voal_dwh_dim_clients_hist ( client_id, last_name, first_name, patronymic, date_of_birth, passport_num, passport_valid_to, phone, effective_from, effective_to, deleted_flg )
 select 
 	stg.client_id,
 	stg.last_name,
@@ -20,12 +20,12 @@ select
 to_date('9999-12-31','YYYY-MM-DD')) as timestamp) effective_to,
 	'N' 
 from deaise.voal_stg_clients stg
- 	left join deaise.voal_stg_clients_hist tgt
+ 	left join deaise.voal_dwh_dim_clients_hist tgt
  	on stg.client_id = tgt.client_id 
 where tgt.client_id is null;
 
 -- 3. Обновление в приемнике "обновлений" на источнике (формат SCD2).
-insert into deaise.voal_stg_clients_hist ( client_id, last_name, first_name, patronymic, date_of_birth, passport_num, passport_valid_to, phone, effective_from, effective_to, deleted_flg )
+insert into deaise.voal_dwh_dim_clients_hist ( client_id, last_name, first_name, patronymic, date_of_birth, passport_num, passport_valid_to, phone, effective_from, effective_to, deleted_flg )
 select 
 	stg.client_id,
 	stg.last_name,
@@ -39,7 +39,7 @@ select
 	to_date('9999-12-31','YYYY-MM-DD') as timestamp ,
 	'N' 
 from deaise.voal_stg_clients stg 
-    inner join deaise.voal_stg_clients_hist tgt
+    inner join deaise.voal_dwh_dim_clients_hist tgt
     on stg.client_id = tgt.client_id
     and tgt.effective_to = to_date('9999-12-31','YYYY-MM-DD')
 where ( stg.last_name <> tgt.last_name or (stg.last_name is null and tgt.last_name is not null) or (stg.last_name is not null and tgt.last_name is null)
@@ -51,7 +51,7 @@ where ( stg.last_name <> tgt.last_name or (stg.last_name is null and tgt.last_na
         or stg.phone <> tgt.phone or (stg.phone is null and tgt.phone is not null) or (stg.phone is not null and tgt.phone is null))
         or tgt.deleted_flg = 'Y';
 
-update deaise.voal_stg_clients_hist tgt 
+update deaise.voal_dwh_dim_clients_hist tgt 
    set effective_to = tmp.create_dt - interval '1 second'
 from (
 	select 
@@ -65,7 +65,7 @@ from (
 		stg.phone,
 		stg.create_dt
 	from deaise.voal_stg_clients stg 
-	inner join deaise.voal_stg_clients_hist tgt
+	inner join deaise.voal_dwh_dim_clients_hist tgt
 	  	on stg.client_id = tgt.client_id
 	 	and tgt.effective_to = to_date('9999-12-31','YYYY-MM-DD')
 	where ( stg.last_name <> tgt.last_name or (stg.last_name is null and tgt.last_name is not null) or (stg.last_name is not null and tgt.last_name is null)
@@ -88,7 +88,7 @@ where tgt.client_id = tmp.client_id
         or tgt.deleted_flg = 'Y';
 
 -- 4. Обработка удалений в приемнике (формат SCD2).
-insert into deaise.voal_stg_clients_hist ( client_id, last_name, first_name, patronymic, date_of_birth, passport_num, passport_valid_to, phone, effective_from, effective_to, deleted_flg )
+insert into deaise.voal_dwh_dim_clients_hist ( client_id, last_name, first_name, patronymic, date_of_birth, passport_num, passport_valid_to, phone, effective_from, effective_to, deleted_flg )
 select 
     tgt.client_id,
 	tgt.last_name,
@@ -101,19 +101,19 @@ select
 	now() start_dt,
 	to_date('9999-12-31','YYYY-MM-DD') end_dt,
 	'Y' deleted_flg
-from deaise.voal_stg_clients_hist tgt 
+from deaise.voal_dwh_dim_clients_hist tgt 
 left join deaise.voal_stg_clients_del stg
   	on stg.client_id = tgt.client_id
 where stg.client_id is null
   	and tgt.effective_to = to_date('9999-12-31','YYYY-MM-DD')
   	and tgt.deleted_flg = 'N';
 
-update deaise.voal_stg_clients_hist tgt 
+update deaise.voal_dwh_dim_clients_hist tgt 
    set effective_to = now() - interval '1 second'
 where tgt.client_id in (
 	select 
 		tgt.client_id
-	from deaise.voal_stg_clients_hist tgt left join 
+	from deaise.voal_dwh_dim_clients_hist tgt left join 
 		 deaise.voal_stg_clients_del stg
 	  on stg.client_id = tgt.client_id
 	where stg.client_id is null

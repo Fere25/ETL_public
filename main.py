@@ -6,12 +6,30 @@ from datetime import datetime
 
 print('Создание подключений')
 
+
+with open("./access/bank.txt", "r") as file:
+    username_b = file.readline().strip()
+    password_b = file.readline().strip()
+
+with open("./access/edu.txt", "r") as file:
+    username_e = file.readline().strip()
+    password_e = file.readline().strip()
+
+
 # Создание подключения к PostgreSQL
-conn_src = psycopg2.connect(*)
+conn_src = psycopg2.connect(database = "bank",
+                            host =     "de-edu-db.chronosavant.ru",
+                            user =     username_b,
+                            password = password_b,
+                            port =     "5432")
 
 print('Подключились к bank')
 
-conn_dwh = psycopg2.connect(*)
+conn_dwh = psycopg2.connect(database = "edu",
+                            host =     "de-edu-db.chronosavant.ru",
+                            user =     username_e,
+                            password = password_e,
+                            port =     "5432")
 
 
 print('Подключились к edu')
@@ -46,7 +64,7 @@ cursor_dwh = conn_dwh.cursor()
 ## Очистка Stage
 print('0. Очистка stage')
 
-cursor_dwh.execute( "delete from deaise.voal_stg_blacklist" )
+cursor_dwh.execute( "delete from deaise.voal_stg_passport_blacklist" )
 cursor_dwh.execute( "delete from deaise.voal_stg_transactions" )
 cursor_dwh.execute( "delete from deaise.voal_stg_cards" )
 cursor_dwh.execute( "delete from deaise.voal_stg_accounts" )
@@ -57,7 +75,7 @@ cursor_dwh.execute( "delete from deaise.voal_stg_terminals" )
 print('1. Загрузка в stage')
 
 ## voal_stg_passport_blacklist
-print('1.1. voal_stg_blacklist')
+print('1.1. voal_stg_passport_blacklist')
 
 for filename in os.listdir(directory):
     if filename.endswith('.xlsx') and "passport_blacklist_" in filename:
@@ -68,7 +86,7 @@ for filename in os.listdir(directory):
         
         os.rename(source_path, destination_path)
         os.replace(os.path.join(directory_backup, destination_filename), destination_path)
-cursor_dwh.executemany( "INSERT INTO deaise.voal_stg_blacklist( entry_dt, passport_num ) VALUES( %s, %s )", df.values.tolist() )
+cursor_dwh.executemany( "INSERT INTO deaise.voal_stg_passport_blacklist( entry_dt, passport_num ) VALUES( %s, %s )", df.values.tolist() )
 
 ## voal_stg_transactions
 print('1.2. voal_stg_transactions')
@@ -213,7 +231,15 @@ execute_sql_from_file('./sql_scripts/clients.sql')
 
 
 print('3 Загрузка данных в Fraud')
-execute_sql_from_file('./sql_scripts/fraud.sql')
+
+#Первая проверка
+execute_sql_from_file('./sql_scripts/script1_fraud.sql')
+
+#Вторая проверка
+execute_sql_from_file('./sql_scripts/script2_fraud.sql')
+
+#Третья проверка
+execute_sql_from_file('./sql_scripts/script3_fraud.sql')
 
 ####################################################################################
 # Закрываем соединение

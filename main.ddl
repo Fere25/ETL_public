@@ -1,6 +1,6 @@
 -- Создание стейджинговых таблиц
 
-create table deaise.voal_stg_blacklist (
+create table deaise.voal_stg_passport_blacklist (
 	entry_dt date,
 	passport_num varchar(15)
 );
@@ -102,7 +102,7 @@ create table deaise.voal_dwh_fact_transactions (
 
 -- Таблицы изменений в SCD2
 
-create table deaise.voal_stg_cards_hist (
+create table deaise.voal_dwh_dim_cards_hist (
 	card_num varchar(20),
 	account_num varchar(20),
     effective_from timestamp(0),
@@ -110,7 +110,7 @@ create table deaise.voal_stg_cards_hist (
 	deleted_flg varchar(1)
 );
 
-create table deaise.voal_stg_accounts_hist (
+create table deaise.voal_dwh_dim_accounts_hist (
 	account_num varchar(20),
 	valid_to timestamp(0),
 	client varchar(10),
@@ -119,7 +119,7 @@ create table deaise.voal_stg_accounts_hist (
 	deleted_flg varchar(1)
 );
 
-create table deaise.voal_stg_clients_hist (
+create table deaise.voal_dwh_dim_clients_hist (
 	client_id varchar(10),
 	last_name varchar(20),
 	first_name varchar(20),
@@ -133,7 +133,7 @@ create table deaise.voal_stg_clients_hist (
 	deleted_flg varchar(1)
 );
 
-create table deaise.voal_stg_terminals_hist (
+create table deaise.voal_dwh_dim_terminals_hist (
 	terminal_id varchar(10),
 	terminal_type varchar(4),
 	terminal_city varchar(20),
@@ -169,10 +169,10 @@ create table deaise.voal_rep_fraud (
 -- select * from deaise.voal_meta_stg;
 -- select * from deaise.voal_dwh_fact_passport_blacklist;
 -- select * from deaise.voal_dwh_fact_transactions;
--- select * from deaise.voal_stg_cards_hist;
--- select * from deaise.voal_stg_accounts_hist;
--- select * from deaise.voal_stg_clients_hist;
--- select * from deaise.voal_stg_terminals_hist;
+-- select * from deaise.voal_dwh_dim_cards_hist;
+-- select * from deaise.voal_dwh_dim_accounts_hist;
+-- select * from deaise.voal_dwh_dim_clients_hist;
+-- select * from deaise.voal_dwh_dim_terminals_hist;
 
 --  drop table deaise.voal_stg_blacklist;
 --  drop table deaise.voal_stg_transactions;
@@ -187,10 +187,10 @@ create table deaise.voal_rep_fraud (
 --  drop table deaise.voal_meta_stg;
 --  drop table deaise.voal_dwh_fact_passport_blacklist;
 --  drop table deaise.voal_dwh_fact_transactions;
---  drop table deaise.voal_stg_cards_hist;
---  drop table deaise.voal_stg_accounts_hist;
---  drop table deaise.voal_stg_clients_hist;
---  drop table deaise.voal_stg_terminals_hist;
+--  drop table deaise.voal_dwh_dim_cards_hist;
+--  drop table deaise.voal_dwh_dim_accounts_hist;
+--  drop table deaise.voal_dwh_dim_clients_hist;
+--  drop table deaise.voal_dwh_dim_terminals_hist;
 --  drop table deaise.voal_rep_fraud;
 
 -- delete from deaise.voal_stg_passport_blacklist;
@@ -205,7 +205,7 @@ create table deaise.voal_rep_fraud (
 -- delete from deaise.voal_meta_stg;
 -- delete from deaise.voal_dwh_fact_passport_blacklist;
 -- delete from deaise.voal_dwh_fact_transactions;
--- delete from deaise.voal_stg_cards_hist;
--- delete from deaise.voal_stg_accounts_hist;
--- delete from deaise.voal_stg_clients_hist;
--- delete from deaise.voal_stg_terminals_hist;
+-- delete from deaise.voal_dwh_dim_cards_hist;
+-- delete from deaise.voal_dwh_dim_accounts_hist;
+-- delete from deaise.voal_dwh_dim_clients_hist;
+-- delete from deaise.voal_dwh_dim_terminals_hist;
